@@ -13,14 +13,13 @@ namespace BMCustomStage.Patches
     internal class CalcBgCuePatch
     {
 
-        // Token: 0x06000034 RID: 52 RVA: 0x00004240 File Offset: 0x00002440
+        
         public unsafe static void CreateDetour()
         {
             calcInstance = CalcBGCue;
             calcOriginal = ClassInjector.Detour.Detour<CalcBgCuePatch.CalcDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(MainGame).GetMethod("calcBgCue")).GetValue(null)))).MethodPointer, CalcBgCuePatch.calcInstance);
         }
 
-        // Token: 0x06000035 RID: 53 RVA: 0x00004245 File Offset: 0x00002445
         private static sound_id.cue CalcBGCue(IntPtr thisPtr, Flash2.MainGameDef.eBg eBg)
         {
             if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8)

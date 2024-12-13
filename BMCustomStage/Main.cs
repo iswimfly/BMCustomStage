@@ -190,7 +190,7 @@ namespace BMCustomStage
                 MethodInfo mgdNameToValGetter = mainGameDefeBgType.GetProperty("nameToValueCollection").GetGetMethod();
                 Il2CppSystem.Collections.Generic.Dictionary<string, MainGameDef.eBg> mgdNameToVal = mgdNameToValGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0L)).Cast<Il2CppSystem.Collections.Generic.Dictionary<string, MainGameDef.eBg>>();
                 mgdNameToVal.Add("custom_bg", (MainGameDef.eBg)50);
-				// Store everything relevant from Jungle on a new BgDatum, restore later.
+				// Store everything in the public static dictionary so it can be used anywhere anytime.
                 MgBgDataManager mgBgDataManager = UnityEngine.Object.FindObjectOfType<MgBgDataManager>();
 				foreach (Il2CppSystem.Collections.Generic.KeyValuePair<MainGameDef.eBg, MgBgDatum> kvp in mgBgDataManager.m_bgDataDict)
 				{
@@ -343,7 +343,6 @@ namespace BMCustomStage
 				string backgroundName = string.Empty;
                 if (stage4.CustomBackground)
                 {
-					// Generic custom bg for replacement
                     backgroundName = DataManager.TryGetBgYamlFromStageId(stage4.StageId).OriginalBackgroundName.ToString();
                 }
                 else
@@ -406,12 +405,10 @@ namespace BMCustomStage
 			Log.Info("Created custom course save data");
 		}
 
-		// Token: 0x06000025 RID: 37 RVA: 0x00003268 File Offset: 0x00001468
 		private static void AddMainMenuItems()
 		{
 			SelMgModeItemDataListObject dataList = Main.sequence.GetData<SelMgModeItemDataListObject>((SelMainMenuSequence.Data)2);
-			bool flag = dataList.m_ItemDataList.Count <= 6;
-			if (flag)
+			if (dataList.m_ItemDataList.Count <= 6)
 			{
 				SelMgModeItemData itemData = new SelMgModeItemData();
 				itemData.transitionMenuKind = (SelectorDef.MainMenuKind)9;
@@ -428,8 +425,7 @@ namespace BMCustomStage
 				dataList.m_ItemDataList.Add(itemData);
 			}
 			SelHowToPlayData howToPlayData = Main.sequence.GetData<SelHowToPlayData>((SelMainMenuSequence.Data)25);
-			bool flag2 = howToPlayData.m_PCData.m_MainGameDataArray.Length <= 8;
-			if (flag2)
+			if (howToPlayData.m_PCData.m_MainGameDataArray.Length <= 8)
 			{
 				SelHowToPlayItemDataListObject[] newHowToPlayArray = new SelHowToPlayItemDataListObject[9];
 				System.Array.Copy(howToPlayData.m_PCData.m_MainGameDataArray, newHowToPlayArray, 8);

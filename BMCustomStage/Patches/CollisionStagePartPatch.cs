@@ -9,17 +9,16 @@ using UnityEngine;
 
 namespace BMCustomStage.Patches
 {
-	// Token: 0x02000009 RID: 9
+	
 	internal class CollisionStagePartPatch
 	{
-		// Token: 0x06000028 RID: 40 RVA: 0x00003468 File Offset: 0x00001668
+		
 		public unsafe static void CreateDetour()
 		{
 			AwakeInstance = Awake;
 			AwakeOriginal = ClassInjector.Detour.Detour<CollisionStagePartPatch.AwakeDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(CollisionStagePart).GetMethod("Awake")).GetValue(null)))).MethodPointer, CollisionStagePartPatch.AwakeInstance);
 		}
 
-		// Token: 0x06000029 RID: 41 RVA: 0x000034E0 File Offset: 0x000016E0
 		private static void Awake(IntPtr thisPtr)
 		{
 			bool flag = GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8;

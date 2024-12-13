@@ -35,8 +35,6 @@ namespace BMCustomStage
             }
         }
 
-        // Token: 0x1700000A RID: 10
-        // (get) Token: 0x06000014 RID: 20 RVA: 0x00002103 File Offset: 0x00000303
         [YamlIgnore]
         public string AssetBundleName
         {
@@ -46,9 +44,6 @@ namespace BMCustomStage
             }
         }
 
-        // Token: 0x1700000B RID: 11
-        // (get) Token: 0x06000015 RID: 21 RVA: 0x00002125 File Offset: 0x00000325
-        // (set) Token: 0x06000016 RID: 22 RVA: 0x0000212D File Offset: 0x0000032D
         [YamlIgnore]
         public string AssetBundleFullPath { get; set; }
 

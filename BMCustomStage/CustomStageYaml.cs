@@ -5,7 +5,7 @@ using static Flash2.stcoli_smkb2;
 
 namespace BMCustomStage
 {
-	// Token: 0x02000004 RID: 4
+
 	public class CustomStageYaml
 	{
 
