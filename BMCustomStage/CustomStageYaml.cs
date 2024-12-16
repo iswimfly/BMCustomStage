@@ -1,7 +1,7 @@
 ﻿using System;
 using Flash2;
 using YamlDotNet.Serialization;
-using static Flash2.stcoli_smkb2;
+
 
 namespace BMCustomStage
 {
@@ -39,6 +39,8 @@ namespace BMCustomStage
 		[YamlMember(Alias = "time_limit_golden_banana", Description = "\nThe time limit for golden banana mode, in seconds.")]
 		public int TimeLimitGoldenBanana { get; set; }
 
+		
+
         [YamlIgnore]
 		public int StageId
 		{
@@ -60,6 +62,8 @@ namespace BMCustomStage
 		[YamlIgnore]
 		public string AssetBundleFullPath { get; set; }
 
+		[YamlIgnore]
+		public string PackPath { get; set; }
         
     }
 }

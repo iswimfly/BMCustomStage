@@ -21,7 +21,7 @@ namespace BMCustomStage.Patches
 
 		private static void Awake(IntPtr thisPtr)
 		{
-			bool flag = GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8;
+			bool flag = GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9;
 			if (flag)
 			{
 				CollisionStagePart collisionStagePart = new CollisionStagePart(thisPtr);

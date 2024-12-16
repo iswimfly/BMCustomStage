@@ -79,11 +79,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomBgYaml.cs" />
+    <Compile Include="CustomCourse.cs" />
     <Compile Include="CustomStageYaml.cs" />
     <Compile Include="DataManager.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Microsoft\CodeAnalysis\EmbeddedAttribute.cs" />
     <Compile Include="Patches\AssetBundleCachePatch.cs" />
     <Compile Include="Patches\BgPatch.cs" />
     <Compile Include="Patches\CalcBgCuePatch.cs" />
@@ -91,11 +91,11 @@
     <Compile Include="Patches\FadeInPatch.cs" />
     <Compile Include="Patches\GameParamPatch.cs" />
     <Compile Include="Patches\MainGameStagePatch.cs" />
+    <Compile Include="Patches\SelMgStageSelectWindowPatchCategory.cs" />
     <Compile Include="Patches\SelMgModeSelectWindowPatch.cs" />
-    <Compile Include="Patches\SelMgStageSelectWindowPatch.cs" />
+    <Compile Include="Patches\SelMgStageSelectWindowPatchPractice.cs" />
     <Compile Include="Patches\TestPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="System\Runtime\CompilerServices\RefSafetyRulesAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

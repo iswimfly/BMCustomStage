@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Flash2;
 using YamlDotNet.Serialization;
-using static Flash2.CollisionGoalTape.GOALTAPE_BAND_POINT;
 
 namespace BMCustomStage
 {
@@ -27,17 +26,33 @@ namespace BMCustomStage
 				return DataManager.uniqueBgToData.Values;
 			}
 		}
+
+		public static IReadOnlyCollection<CustomCourse> Courses
+		{
+			get
+			{
+				return DataManager.nameToCourse.Values;
+			}
+		}
+
 		public static void Initialise()
 		{
 			string stageFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "custom_stages");
-			bool flag = !Directory.Exists(stageFolderPath);
-			if (!flag)
+			if (Directory.Exists(stageFolderPath))
 			{
                 Dictionary<int, ValueTuple<CustomStageYaml, DateTime>> stages = new Dictionary<int, ValueTuple<CustomStageYaml, DateTime>>();
 				IDeserializer deserializer = new DeserializerBuilder().Build();
 				IEnumerable<string> source = Directory.EnumerateDirectories(stageFolderPath);
+				int courseValue = 45;
 				foreach (string packPath in source)
 				{
+					CustomCourse newCourse = new CustomCourse
+					{
+						courseName = packPath.Split('\\').Last(),
+                        courseEnum = courseValue
+					};
+					nameToCourse.Add(packPath.Split('\\').Last(), newCourse);
+					courseValue++;
 					string stagesPath = Path.Combine(packPath, "stages");
 					bool flag2 = !Directory.Exists(stagesPath);
 					if (!flag2)
@@ -120,7 +135,8 @@ namespace BMCustomStage
 															" is newer"
 														}));
 													}
-													stages[customStageYaml.StageId] = new ValueTuple<CustomStageYaml, DateTime>(customStageYaml, lastModifiedTime);
+													customStageYaml.PackPath = packPath.Split('\\').Last();
+                                                    stages[customStageYaml.StageId] = new ValueTuple<CustomStageYaml, DateTime>(customStageYaml, lastModifiedTime);
 												}
 											}
 										}
@@ -352,5 +368,8 @@ namespace BMCustomStage
 		private static readonly Dictionary<string, CustomBgYaml> uniqueBgToData = new Dictionary<string, CustomBgYaml>();
 
 		private static readonly Dictionary<string, string> abNameToBgName = new Dictionary<string, string>();
+
+		private static readonly Dictionary<string, CustomCourse> nameToCourse = new Dictionary<string, CustomCourse>();
+
 	}
 }

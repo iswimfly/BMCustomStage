@@ -22,11 +22,12 @@ namespace BMCustomStage.Patches
 
         private static sound_id.cue CalcBGCue(IntPtr thisPtr, Flash2.MainGameDef.eBg eBg)
         {
-            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8)
+            int stageID = MainGame.Instance.GetStageID();
+            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9)
             {
                 foreach (CustomStageYaml stage in DataManager.Stages)
                 {
-                    if (stage.StageId == GameParam.selectorParam.selectedStageIndex)
+                    if (stage.StageId == stageID)
                     {
                         if (stage.CustomBackground)
                         {
@@ -47,22 +48,21 @@ namespace BMCustomStage.Patches
                                     }
                                 }
                             }
-                            return Main.stageIndexToCue[GameParam.selectorParam.selectedStageIndex];
+                            return Main.stageIndexToCue[stageID];
 
                         }
                         else
                         {
-                            return Main.stageIndexToCue[GameParam.selectorParam.selectedStageIndex];
+                            return Main.stageIndexToCue[stageID];
                         }
                     }
                 }
-                return Main.stageIndexToCue[GameParam.selectorParam.selectedStageIndex];
+                return Main.stageIndexToCue[stageID];
             }
             else
             {
                 return Main.stageIndexToCue[GameParam.selectorParam.selectedStageIndex];
             }
-            CalcBgCuePatch.calcOriginal(thisPtr, eBg);
         }
 
         private static CalcBgCuePatch.CalcDelegate calcInstance;

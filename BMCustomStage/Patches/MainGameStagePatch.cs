@@ -51,7 +51,7 @@ namespace BMCustomStage.Patches
 			MainGameStage mainGameStage = new MainGameStage(thisPtr);
 			MgStageDatum mgStageDatum = new MgStageDatum(mgStageDatumPtr);
 
-			if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8)
+			if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9)
 			{
 
                 foreach (Renderer renderer in mainGameStage.GetComponentsInChildren<Renderer>())

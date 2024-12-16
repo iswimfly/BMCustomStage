@@ -8,35 +8,49 @@ using UnhollowerRuntimeLib;
 
 namespace BMCustomStage.Patches
 {
-	
-	internal static class SelMgModeSelectWindowPatch
-	{
-		
-		public unsafe static void CreateDetour()
-		{
-			SelMgModeSelectWindowPatch.OnSubmitInstance = OnSubmit;
-			SelMgModeSelectWindowPatch.OnSubmitOriginal = ClassInjector.Detour.Detour<SelMgModeSelectWindowPatch.OnSubmitDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(SelMgModeSelectWindow).GetMethod("onSubmit")).GetValue(null)))).MethodPointer, SelMgModeSelectWindowPatch.OnSubmitInstance);
-		}
 
-		
-		private static void OnSubmit(IntPtr thisPtr, int playerIndex, AppInput.eLayer inputLayer, IntPtr itemDataPtr)
-		{
-			SelTextItemData itemData = new SelTextItemData(itemDataPtr);
-			SelMgModeItemData modeItemData = itemData.Cast<SelMgModeItemData>();
-			SelMgModeSelectWindowPatch.OnSubmitOriginal(thisPtr, playerIndex, inputLayer, itemDataPtr);
-			if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)8)
-			{
-				GameParam.selectorParam.practiceSelectedCourse = (MainGameDef.eCourse)44;
-				GameParam.selectorParam.selectedCourse = (MainGameDef.eCourse)44;
-				GameParam.selectorParam.selectedStageIndex = 0;
-			}
-		}
+    internal static class SelMgModeSelectWindowPatch
+    {
 
-		private static SelMgModeSelectWindowPatch.OnSubmitDelegate OnSubmitInstance;
+        public unsafe static void CreateDetour()
+        {
+            SelMgModeSelectWindowPatch.OnSubmitInstance = OnSubmit;
+            SelMgModeSelectWindowPatch.OnSubmitOriginal = ClassInjector.Detour.Detour<SelMgModeSelectWindowPatch.OnSubmitDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(SelMgModeSelectWindow).GetMethod("onSubmit")).GetValue(null)))).MethodPointer, SelMgModeSelectWindowPatch.OnSubmitInstance);
+        }
 
-		private static SelMgModeSelectWindowPatch.OnSubmitDelegate OnSubmitOriginal;
 
-		private delegate void OnSubmitDelegate(IntPtr thisPtr, int playerIndex, AppInput.eLayer inputLayer, IntPtr itemDataPtr);
+        private static void OnSubmit(IntPtr thisPtr, int playerIndex, AppInput.eLayer inputLayer, IntPtr itemDataPtr)
+        {
+            SelTextItemData itemData = new SelTextItemData(itemDataPtr);
+            SelMgModeItemData modeItemData = itemData.Cast<SelMgModeItemData>();
+            SelMgModeSelectWindowPatch.OnSubmitOriginal(thisPtr, playerIndex, inputLayer, itemDataPtr);
+            if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)8 || modeItemData.mainGamemode == (SelectorDef.MainGameKind)9)
+            {
+                if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)8)
+                {
+                    GameParam.selectorParam.selectedCourse = (MainGameDef.eCourse)44;
+                    GameParam.selectorParam.practiceSelectedCourse = (MainGameDef.eCourse)44;
+                }
+                else if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)9)
+                {
+                    foreach (CustomCourse course in DataManager.Courses)
+                    {
+                        if (modeItemData.textKey.Contains(course.courseName))
+                        {
+                            GameParam.selectorParam.practiceSelectedCourse = (MainGameDef.eCourse)course.courseEnum;
+                            GameParam.selectorParam.selectedCourse = (MainGameDef.eCourse)course.courseEnum;
+                        }
+                    }
+                }
+                GameParam.selectorParam.selectedStageIndex = 0;
+            }
+        }
 
-	}
+        private static SelMgModeSelectWindowPatch.OnSubmitDelegate OnSubmitInstance;
+
+        private static SelMgModeSelectWindowPatch.OnSubmitDelegate OnSubmitOriginal;
+
+        private delegate void OnSubmitDelegate(IntPtr thisPtr, int playerIndex, AppInput.eLayer inputLayer, IntPtr itemDataPtr);
+
+    }
 }

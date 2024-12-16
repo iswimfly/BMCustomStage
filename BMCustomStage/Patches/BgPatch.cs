@@ -22,11 +22,12 @@ namespace BMCustomStage.Patches
 
         private static void LoadAsset(IntPtr thisPtr)
         {
-            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8)
+            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9)
             {
+                int stageID = MainGame.Instance.GetStageID();
                 foreach (CustomStageYaml stage in DataManager.Stages)
                 {
-                    if (stage.StageId == GameParam.selectorParam.selectedStageIndex)
+                    if (stage.StageId == stageID)
                     {
                         if (stage.CustomBackground)
                         {
