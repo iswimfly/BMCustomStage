@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Flash2;
+using Newtonsoft.Json;
 using YamlDotNet.Serialization;
 
 namespace BMCustomStage
@@ -37,115 +38,168 @@ namespace BMCustomStage
 
 		public static void Initialise()
 		{
-			string stageFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "custom_stages");
-			if (Directory.Exists(stageFolderPath))
-			{
+            string stageFolderPath;
+            if (!Main.melonMode)
+            {
+                stageFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "custom_stages");
+            }
+            else
+            {
+                stageFolderPath = Path.Combine("H:\\SteamLibrary\\steamapps\\common\\smbbm\\mods\\", "custom_stages");
+            }
+            if (Directory.Exists(stageFolderPath))
+            {
                 Dictionary<int, ValueTuple<CustomStageYaml, DateTime>> stages = new Dictionary<int, ValueTuple<CustomStageYaml, DateTime>>();
-				IDeserializer deserializer = new DeserializerBuilder().Build();
-				IEnumerable<string> source = Directory.EnumerateDirectories(stageFolderPath);
-				int courseValue = 45;
-				foreach (string packPath in source)
-				{
-					CustomCourse newCourse = new CustomCourse
-					{
-						courseName = packPath.Split('\\').Last(),
-                        courseEnum = courseValue
-					};
-					nameToCourse.Add(packPath.Split('\\').Last(), newCourse);
-					courseValue++;
-					string stagesPath = Path.Combine(packPath, "stages");
-					bool flag2 = !Directory.Exists(stagesPath);
-					if (!flag2)
-					{
-						IEnumerable<string> source2 = Directory.EnumerateDirectories(stagesPath);
-						foreach (string stagePath in source2)
-						{
-							string stageConfigPath = Path.Combine(stagePath, "custom_stage.yaml");
-							if (!File.Exists(stageConfigPath))
-							{
-								Log.Warning("Failed to load stage at " + stagePath + ":\n    The custom_stage.yaml configuration file does not exist.");
-							}
-							else
-							{
-								CustomStageYaml customStageYaml;
-								try
-								{
-									customStageYaml = deserializer.Deserialize<CustomStageYaml>(File.ReadAllText(stageConfigPath));
-								}
-								catch
-								{
-									Log.Warning("Failed to load stage at " + stagePath + ":\n    An unknown error occured while parsing the custom_stage.yaml file.");
-									continue;
-								}
-								if (customStageYaml.AuthorId == 0 || customStageYaml.AuthorId > 32767)
-								{
-									Log.Warning("Failed to load stage at " + stagePath + ":\n    The author ID is invalid.");
-								}
-								else
-								{
-									if (string.IsNullOrWhiteSpace(customStageYaml.AuthorName))
-									{
-										Log.Warning("Failed to load stage at " + stagePath + ":\n    The author name is empty.");
-									}
-									else
-									{
-										if (string.IsNullOrWhiteSpace(customStageYaml.StageName))
-										{
-											Log.Warning("Failed to load stage at " + stagePath + ":\n    The stage name is empty.");
-										}
-										else
-										{
-											if (customStageYaml.Background == null)
-											{
-												Log.Warning("Failed to load stage at " + stagePath + ":\n    The background is invalid.");
-											}
-											else
-											{
-												customStageYaml.AssetBundleFullPath = Path.Combine(stagePath, customStageYaml.AssetBundleName);
+                IDeserializer deserializer = new DeserializerBuilder().Build();
+                IEnumerable<string> source = Directory.EnumerateDirectories(stageFolderPath);
+                foreach (string packPath in source)
+                {
+                    string packName = packPath.Split('\\').Last();
+                    bool thumbnails = File.Exists(Path.Combine(packPath + $"\\{packName}_thumbnails"));
+                    if (thumbnails)
+                    {
+                        thumbnailAbNameToAbPath.Add($"{packName}_thumbnails", Path.Combine(packPath + $"\\{ packName}_thumbnails"));
+                    }
+                    string stagesPath = Path.Combine(packPath, "stages");
+                    bool flag2 = !Directory.Exists(stagesPath);
+                    if (!flag2)
+                    {
+                        IEnumerable<string> source2 = Directory.EnumerateDirectories(stagesPath);
+                        foreach (string stagePath in source2)
+                        {
+                            string stageConfigPath = Path.Combine(stagePath, "custom_stage.yaml");
+                            if (!File.Exists(stageConfigPath))
+                            {
+                                Log.Warning("Failed to load stage at " + stagePath + ":\n    The custom_stage.yaml configuration file does not exist.");
+                            }
+                            else
+                            {
+                                CustomStageYaml customStageYaml;
+                                try
+                                {
+                                    customStageYaml = deserializer.Deserialize<CustomStageYaml>(File.ReadAllText(stageConfigPath));
+                                }
+                                catch
+                                {
+                                    Log.Warning("Failed to load stage at " + stagePath + ":\n    An unknown error occured while parsing the custom_stage.yaml file.");
+                                    continue;
+                                }
+                                if (customStageYaml.AuthorId == 0 || customStageYaml.AuthorId > 32767)
+                                {
+                                    Log.Warning("Failed to load stage at " + stagePath + ":\n    The author ID is invalid.");
+                                }
+                                else
+                                {
+                                    if (string.IsNullOrWhiteSpace(customStageYaml.AuthorName))
+                                    {
+                                        Log.Warning("Failed to load stage at " + stagePath + ":\n    The author name is empty.");
+                                    }
+                                    else
+                                    {
+                                        if (string.IsNullOrWhiteSpace(customStageYaml.StageName))
+                                        {
+                                            Log.Warning("Failed to load stage at " + stagePath + ":\n    The stage name is empty.");
+                                        }
+                                        else
+                                        {
+                                            if (customStageYaml.Background == null)
+                                            {
+                                                Log.Warning("Failed to load stage at " + stagePath + ":\n    The background is invalid.");
+                                            }
+                                            else
+                                            {
+                                                customStageYaml.AssetBundleFullPath = Path.Combine(stagePath, customStageYaml.AssetBundleName);
 
                                                 if (!File.Exists(customStageYaml.AssetBundleFullPath))
-												{
-													Log.Warning("Failed to load stage at " + stagePath + ":\n    The asset bundle file does not exist.");
-												}
-												else
-												{
-													DateTime lastModifiedTime = File.GetLastWriteTimeUtc(customStageYaml.AssetBundleFullPath);
-													ValueTuple<CustomStageYaml, DateTime> existingStage;
-													if (stages.TryGetValue(customStageYaml.StageId, out existingStage))
-													{
-														bool flag10 = lastModifiedTime < existingStage.Item2;
-														if (flag10)
-														{
-															Log.Info(string.Concat(new string[]
-															{
-																"Skipping stage at ",
-																stagePath,
-																" because ",
-																Path.GetDirectoryName(existingStage.Item1.AssetBundleFullPath),
-																" is newer"
-															}));
-															continue;
-														}
-														Log.Info(string.Concat(new string[]
-														{
-															"Skipping stage at ",
-															Path.GetDirectoryName(existingStage.Item1.AssetBundleFullPath),
-															" because ",
-															stagePath,
-															" is newer"
-														}));
-													}
-													customStageYaml.PackPath = packPath.Split('\\').Last();
+                                                {
+                                                    Log.Warning("Failed to load stage at " + stagePath + ":\n    The asset bundle file does not exist.");
+                                                }
+                                                else
+                                                {
+                                                    DateTime lastModifiedTime = File.GetLastWriteTimeUtc(customStageYaml.AssetBundleFullPath);
+                                                    ValueTuple<CustomStageYaml, DateTime> existingStage;
+                                                    if (stages.TryGetValue(customStageYaml.StageId, out existingStage))
+                                                    {
+                                                        bool flag10 = lastModifiedTime < existingStage.Item2;
+                                                        if (flag10)
+                                                        {
+                                                            Log.Info(string.Concat(new string[]
+                                                            {
+                                                                "Skipping stage at ",
+                                                                stagePath,
+                                                                " because ",
+                                                                Path.GetDirectoryName(existingStage.Item1.AssetBundleFullPath),
+                                                                " is newer"
+                                                            }));
+                                                            continue;
+                                                        }
+                                                        Log.Info(string.Concat(new string[]
+                                                        {
+                                                            "Skipping stage at ",
+                                                            Path.GetDirectoryName(existingStage.Item1.AssetBundleFullPath),
+                                                            " because ",
+                                                            stagePath,
+                                                            " is newer"
+                                                        }));
+                                                    }
+                                                    customStageYaml.PackPath = packPath.Split('\\').Last();
                                                     stages[customStageYaml.StageId] = new ValueTuple<CustomStageYaml, DateTime>(customStageYaml, lastModifiedTime);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    string[] packsArray = Directory.GetFiles(packPath);
+                    Array.Sort(packsArray);
+                    foreach (string file in packsArray)
+                    {
+                        Log.Info(file);
+                        if (file.Contains(".json"))
+                        {
+                            CustomCourse course = JsonConvert.DeserializeObject<CustomCourse>(File.ReadAllText(file));
+                            if (thumbnails)
+                            {
+                                course.ThumbnailAssetBundle = packName + "_thumbnails";
+                                course.ThumbnailPath = $"thumbnails/custom/{course.ThumbnailName}";
+                            }
+                            else
+                            {
+                                course.ThumbnailPath = null;
+                            }
+                            foreach (Subcategory subcat in course.Subcategories)
+                            {
+                                subcat.CourseEnum = ((int)course.AuthorId << 16) + (int)subcat.CourseID;
+                                if (string.IsNullOrEmpty(subcat.ThumbnailName))
+                                {
+                                    subcat.ThumbnailPath = null;
+                                }
+                                else
+                                {
+                                    if (thumbnails)
+                                    {
+                                        subcat.ThumbnailPath = $"thumbnails/custom/{subcat.ThumbnailName}";
+                                    }
+                                    else
+                                    {
+                                        subcat.ThumbnailPath = null;
+                                    }
+                                }
+                            }
+                            if (course.CategoryType == "Story" || course.CategoryType == "Challenge")
+                            {
+                                nameToCourse.Add(course.CourseName, course);
+                            }
+                            else
+                            {
+                                Log.Error($"Invalid Course: {course.CourseName}. Please specify \"Story\" or \"Challenge\" as the category type.");
+                            }
+                        }
+                    }
+                }
+
                 foreach (CustomStageYaml customStageYaml2 in from value in stages.Values
 				orderby value.Item1.StageId
 				select value.Item1)
@@ -154,10 +208,18 @@ namespace BMCustomStage
 					DataManager.abNameToStageId[customStageYaml2.AssetBundleName] = customStageYaml2.StageId;
 					Log.Info("Added custom stage at " + Path.GetDirectoryName(customStageYaml2.AssetBundleFullPath));
 				}
-				
-				// Leaving this here in case I change where things are placed. Probably won't though.
-                string bgFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "custom_stages");
-				if (Directory.Exists(bgFolderPath))
+
+                // Leaving this here in case I change where things are placed. Probably won't though.
+                string bgFolderPath;
+                if (Main.melonMode)
+                {
+                    bgFolderPath = Path.Combine("H:\\SteamLibrary\\steamapps\\common\\smbbm\\mods\\", "custom_stages");
+                }
+                else
+                {
+                    bgFolderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "custom_stages");
+                }
+                if (Directory.Exists(bgFolderPath))
                 {
                     Dictionary<string, ValueTuple<CustomBgYaml, DateTime>> backgrounds = new Dictionary<string, ValueTuple<CustomBgYaml, DateTime>>();
                     IDeserializer bgDeserializer = new DeserializerBuilder().Build();
@@ -360,7 +422,12 @@ namespace BMCustomStage
 			return result;
 		}
 
-
+        public static string TryGetThumbnailAb(string assetBundleName)
+        {
+            string result = null;
+            thumbnailAbNameToAbPath.TryGetValue(assetBundleName, out result);
+            return result;
+        }
         private static readonly Dictionary<int, CustomStageYaml> uniqueIdToStage = new Dictionary<int, CustomStageYaml>();
 
 		private static readonly Dictionary<string, int> abNameToStageId = new Dictionary<string, int>();
@@ -370,6 +437,8 @@ namespace BMCustomStage
 		private static readonly Dictionary<string, string> abNameToBgName = new Dictionary<string, string>();
 
 		private static readonly Dictionary<string, CustomCourse> nameToCourse = new Dictionary<string, CustomCourse>();
+
+        private static readonly Dictionary<string, string> thumbnailAbNameToAbPath = new Dictionary<string, string>();
 
 	}
 }

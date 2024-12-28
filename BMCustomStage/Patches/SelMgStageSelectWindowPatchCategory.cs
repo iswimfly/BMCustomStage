@@ -22,8 +22,25 @@ namespace BMCustomStage.Patches
         private static void OnSubmit(IntPtr thisPtr, int playerIndex, AppInput.eLayer inputLayer, IntPtr itemDataPtr)
         {
             SelIconAndBestTimeItemData itemData = new SelIconAndBestTimeItemData(itemDataPtr);
-            SelMgStageSelectWindowPatchCategory.OnSubmitOriginal(thisPtr, playerIndex, inputLayer, itemDataPtr);
+            foreach (CustomCourse customCourse in DataManager.Courses)
+            {
+                foreach (Subcategory subcategory in customCourse.Subcategories)
+                {
+                    if ((int)GameParam.selectorParam.selectedCourse == subcategory.CourseEnum)
+                    {
+                        Il2CppStructArray<MainGameDef.eCourse> newStoryModeDef = new Il2CppStructArray<MainGameDef.eCourse>(Main.storyDict["original"].Count);
 
+                        for (int j = 0; j < Main.storyDict["original"].Count; j++)
+                        {
+                            newStoryModeDef[j] = Main.storyDict["original"][j];
+                        }
+                        MainGameDef._storyCourses_k__BackingField = newStoryModeDef;
+                        Main.selectedCourse = customCourse.CourseName;
+                        Main.VibeCheck();
+                    }
+                }
+            }
+            SelMgStageSelectWindowPatchCategory.OnSubmitOriginal(thisPtr, playerIndex, inputLayer, itemDataPtr);
         }
 
         private static SelMgStageSelectWindowPatchCategory.OnSubmitDelegate OnSubmitInstance;

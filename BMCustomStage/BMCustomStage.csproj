@@ -55,7 +55,14 @@
     <Reference Include="Il2CppSystem.Xml.Linq">
       <HintPath>..\..\References\Il2CppSystem.Xml.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Text.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\References\System.Text.Json.dll</HintPath>
+    </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>..\..\References\UnhollowerBaseLib.dll</HintPath>
     </Reference>
@@ -91,11 +98,17 @@
     <Compile Include="Patches\FadeInPatch.cs" />
     <Compile Include="Patches\GameParamPatch.cs" />
     <Compile Include="Patches\MainGameStagePatch.cs" />
+    <Compile Include="Patches\SelMgCourseSelectWindowPatch.cs" />
     <Compile Include="Patches\SelMgStageSelectWindowPatchCategory.cs" />
     <Compile Include="Patches\SelMgModeSelectWindowPatch.cs" />
     <Compile Include="Patches\SelMgStageSelectWindowPatchPractice.cs" />
+    <Compile Include="Patches\SelMgWorldSelectWindowPatch.cs" />
+    <Compile Include="Patches\SelPauseWindowPatch.cs" />
     <Compile Include="Patches\TestPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

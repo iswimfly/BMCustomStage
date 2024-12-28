@@ -39,7 +39,14 @@ namespace BMCustomStage
 		[YamlMember(Alias = "time_limit_golden_banana", Description = "\nThe time limit for golden banana mode, in seconds.")]
 		public int TimeLimitGoldenBanana { get; set; }
 
-		
+        [YamlMember(Alias = "is_bonus", Description = "\n Set to true if this stage is a bonus stage.")]
+        public bool IsBonus { get; set; }
+
+        [YamlMember(Alias = "green_goal_value", Description = "\n The amount a green warp goal should send the player forward in a Challenge Mode category.")]
+        public int GreenGoalValue { get; set; }
+
+        [YamlMember(Alias = "red_goal_value", Description = "\n The amount a red warp goal should send the player forward in a Challenge Mode category.")]
+        public int RedGoalValue { get; set; }
 
         [YamlIgnore]
 		public int StageId

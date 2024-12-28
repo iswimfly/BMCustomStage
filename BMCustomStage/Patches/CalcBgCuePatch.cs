@@ -13,7 +13,7 @@ namespace BMCustomStage.Patches
     internal class CalcBgCuePatch
     {
 
-        
+
         public unsafe static void CreateDetour()
         {
             calcInstance = CalcBGCue;
@@ -23,7 +23,7 @@ namespace BMCustomStage.Patches
         private static sound_id.cue CalcBGCue(IntPtr thisPtr, Flash2.MainGameDef.eBg eBg)
         {
             int stageID = MainGame.Instance.GetStageID();
-            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9)
+            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)10)
             {
                 foreach (CustomStageYaml stage in DataManager.Stages)
                 {
@@ -39,10 +39,12 @@ namespace BMCustomStage.Patches
                                     {
                                         if (OptionsDef.AudioDef.LoadBGMMode() == 0)
                                         {
+                                            Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)bgYaml.bgm_cuesheetid);
                                             return (sound_id.cue)bgYaml.bgm_cueid;
                                         }
                                         else if (OptionsDef.AudioDef.LoadBGMMode() == 1 && bgYaml.bgm_dx_cueid != 0)
                                         {
+                                            Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)bgYaml.bgm_dx_cuesheetid);
                                             return (sound_id.cue)bgYaml.bgm_dx_cueid;
                                         }
                                     }
@@ -61,8 +63,9 @@ namespace BMCustomStage.Patches
             }
             else
             {
-                return Main.stageIndexToCue[GameParam.selectorParam.selectedStageIndex];
+                return CalcBgCuePatch.calcOriginal(thisPtr, eBg);
             }
+
         }
 
         private static CalcBgCuePatch.CalcDelegate calcInstance;

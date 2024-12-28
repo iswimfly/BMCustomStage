@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Flash2;
 using Framework;
-using MS.Internal.Xml.XPath;
 using UnhollowerBaseLib.Runtime;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
@@ -31,7 +30,6 @@ namespace BMCustomStage.Patches
             {
                 foreach (Material material in renderer.materials)
                 {
-                    Console.WriteLine(material.shader.name);
                     Shader newShader;
                     if (material.shader.name == "Custom/WormholeSeeThrough")
                     {

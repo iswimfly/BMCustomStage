@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Flash2;
+using Flash2.Selector;
 using Flash2.Selector.MainGame;
+using Flash2.Selector.MainGame.ChallengeMode.SMB1;
 using UnhollowerBaseLib;
 using UnhollowerBaseLib.Runtime;
 using UnhollowerRuntimeLib;
+using UnityEngine;
 
 namespace BMCustomStage.Patches
 {
@@ -24,25 +28,44 @@ namespace BMCustomStage.Patches
             SelTextItemData itemData = new SelTextItemData(itemDataPtr);
             SelMgModeItemData modeItemData = itemData.Cast<SelMgModeItemData>();
             SelMgModeSelectWindowPatch.OnSubmitOriginal(thisPtr, playerIndex, inputLayer, itemDataPtr);
-            if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)8 || modeItemData.mainGamemode == (SelectorDef.MainGameKind)9)
+            SelMainMenuWindowBase worlds = UnityEngine.Object.FindObjectOfType<SelMainMenuSequence>().m_WindowCollection[SelectorDef.MainMenuKind.MgChallengeCourseSelect_SMB1];
+            SelMgCourseSelectWindow selMgCourseSelectWindow = new SelMgCourseSelectWindow(worlds.Pointer);
+            if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)8 || modeItemData.mainGamemode == (SelectorDef.MainGameKind)9 || modeItemData.mainGamemode == (SelectorDef.MainGameKind)10)
             {
                 if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)8)
                 {
                     GameParam.selectorParam.selectedCourse = (MainGameDef.eCourse)44;
                     GameParam.selectorParam.practiceSelectedCourse = (MainGameDef.eCourse)44;
                 }
-                else if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)9)
+                else if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)9 || modeItemData.mainGamemode == (SelectorDef.MainGameKind)10)
                 {
                     foreach (CustomCourse course in DataManager.Courses)
                     {
-                        if (modeItemData.textKey.Contains(course.courseName))
+                        if (modeItemData.mainGamemode == (SelectorDef.MainGameKind)10)
                         {
-                            GameParam.selectorParam.practiceSelectedCourse = (MainGameDef.eCourse)course.courseEnum;
-                            GameParam.selectorParam.selectedCourse = (MainGameDef.eCourse)course.courseEnum;
+                            {
+                                if (GameParam.Instance.m_selectorParam.mainGameMode == (SelectorDef.MainGameKind)10)
+                                {
+                                    if (modeItemData.textKey.Contains(course.CourseName))
+                                    {
+                                        selMgCourseSelectWindow.m_MgCourseData = Main.categoryDict[course.CourseName];
+
+                                    }
+                                }
+                            }
+                        }
+                        if (modeItemData.textKey.Contains(course.CourseName))
+                        {
+                            Main.selectedCourse = course.CourseName;
                         }
                     }
                 }
                 GameParam.selectorParam.selectedStageIndex = 0;
+            }
+            else
+            {
+                Main.selectedCourse = null;
+                selMgCourseSelectWindow.m_MgCourseData = Main.categoryDict["original"];
             }
         }
 

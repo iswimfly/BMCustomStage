@@ -22,7 +22,7 @@ namespace BMCustomStage.Patches
 
         private static void LoadAsset(IntPtr thisPtr)
         {
-            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9)
+            if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)10)
             {
                 int stageID = MainGame.Instance.GetStageID();
                 foreach (CustomStageYaml stage in DataManager.Stages)
@@ -50,8 +50,9 @@ namespace BMCustomStage.Patches
             }
             else
             {
-                Main.originalBgDatumDict[Main.storedBgDatum.m_bg].m_bgObjPath = Main.storedBgDatum.m_bgObjPath;
-                Main.storedBgDatum.m_bg = MainGameDef.eBg.Invalid;
+                Console.WriteLine("Hello");
+                // Main.originalBgDatumDict[Main.storedBgDatum.m_bg].m_bgObjPath = Main.storedBgDatum.m_bgObjPath;
+                // Main.storedBgDatum.m_bg = MainGameDef.eBg.Invalid;
             }
             BgPatch.BgOriginal(thisPtr);
         }
@@ -62,6 +63,5 @@ namespace BMCustomStage.Patches
         private static BgPatch.BgDelegate BgOriginal;
 
         private delegate void BgDelegate(IntPtr thisPtr);
-
     }
 }

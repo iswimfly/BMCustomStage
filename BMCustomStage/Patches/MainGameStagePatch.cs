@@ -42,7 +42,9 @@ namespace BMCustomStage.Patches
 		{
 			InitializeInstance = Initialize;
 			InitializeOriginal = ClassInjector.Detour.Detour<MainGameStagePatch.InitializeDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(MainGameStage).GetMethod("Initialize")).GetValue(null)))).MethodPointer, MainGameStagePatch.InitializeInstance);
-		}
+            ResultDecideInstance = ResultDecide;
+            ResultDecideOriginal = ClassInjector.Detour.Detour<MainGameStagePatch.ResultDecideDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(MainGameStage).GetMethod("updateGoalSub_RESULT_DECIDE")).GetValue(null)))).MethodPointer, MainGameStagePatch.ResultDecideInstance);
+        }
 
 		private static void Initialize(IntPtr thisPtr, int index, MainGameDef.eGameKind gameKind, IntPtr mgStageDatumPtr, IntPtr mgBgDatumPtr, int playerIndex)
 		{
@@ -51,7 +53,7 @@ namespace BMCustomStage.Patches
 			MainGameStage mainGameStage = new MainGameStage(thisPtr);
 			MgStageDatum mgStageDatum = new MgStageDatum(mgStageDatumPtr);
 
-			if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9)
+			if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)10)
 			{
 
                 foreach (Renderer renderer in mainGameStage.GetComponentsInChildren<Renderer>())
@@ -100,8 +102,25 @@ namespace BMCustomStage.Patches
             }
 			MainGameStagePatch.InitializeOriginal(thisPtr, index, gameKind, mgStageDatumPtr, mgBgDatumPtr, playerIndex);
 		}
-		
-		private static readonly Dictionary<string, string> shaderNameToAbPath = new Dictionary<string, string>
+
+        private static void ResultDecide(IntPtr thisPtr)
+        {
+            MainGameStage mainGameStage = new MainGameStage(thisPtr);
+            if (mainGameStage.m_SelectedResultButton == MgResultMenu.eTextKind.StageSelect || mainGameStage.m_SelectedResultButton == MgResultMenu.eTextKind.CourseSelect)
+            {
+                Il2CppStructArray<MainGameDef.eCourse> storyDef = new Il2CppStructArray<MainGameDef.eCourse>(Main.storyDict["original"].Count);
+
+                for (int j = 0; j < Main.storyDict["original"].Count; j++)
+                {
+                    storyDef[j] = Main.storyDict["original"][j];
+                }
+                MainGameDef._storyCourses_k__BackingField = storyDef;
+            }
+            MainGameStagePatch.ResultDecideOriginal(thisPtr);
+
+        }
+
+        private static readonly Dictionary<string, string> shaderNameToAbPath = new Dictionary<string, string>
 		{
 			{
 				"Custom/BilliardsGuideLine",
@@ -473,5 +492,11 @@ namespace BMCustomStage.Patches
 
 		private delegate void InitializeDelegate(IntPtr thisPtr, int index, MainGameDef.eGameKind gameKind, IntPtr mgStageDatumPtr, IntPtr mgBgDatumPtr, int playerIndex);
 
-	}
+        private static MainGameStagePatch.ResultDecideDelegate ResultDecideInstance;
+
+        private static MainGameStagePatch.ResultDecideDelegate ResultDecideOriginal;
+
+        private delegate void ResultDecideDelegate(IntPtr thisPtr);
+
+    }
 }
