@@ -44,14 +44,46 @@ namespace BMCustomStage.Patches
 			InitializeOriginal = ClassInjector.Detour.Detour<MainGameStagePatch.InitializeDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(MainGameStage).GetMethod("Initialize")).GetValue(null)))).MethodPointer, MainGameStagePatch.InitializeInstance);
             ResultDecideInstance = ResultDecide;
             ResultDecideOriginal = ClassInjector.Detour.Detour<MainGameStagePatch.ResultDecideDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(MainGameStage).GetMethod("updateGoalSub_RESULT_DECIDE")).GetValue(null)))).MethodPointer, MainGameStagePatch.ResultDecideInstance);
-        }
+			ChangeNextStageInstance = ChangeNextStage;
+			ChangeNextStageOriginal = ClassInjector.Detour.Detour<MainGameStagePatch.ChangeNextStageDelegate>(UnityVersionHandler.Wrap((Il2CppMethodInfo*)((void*)((IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(typeof(MainGameStage).GetMethod("changeNextStage")).GetValue(null)))).MethodPointer, MainGameStagePatch.ChangeNextStageInstance);
+			
+		}
 
 		private static void Initialize(IntPtr thisPtr, int index, MainGameDef.eGameKind gameKind, IntPtr mgStageDatumPtr, IntPtr mgBgDatumPtr, int playerIndex)
 		{
 			MgBgDataManager mgBgDataManager = UnityEngine.Object.FindObjectOfType<MgBgDataManager>();
 			MgBgDatum mgBgDatum = new MgBgDatum(mgBgDatumPtr);
 			MainGameStage mainGameStage = new MainGameStage(thisPtr);
-			MgStageDatum mgStageDatum = new MgStageDatum(mgStageDatumPtr);
+			foreach (CustomCourse customCourse in DataManager.Courses)
+			{
+				foreach (Subcategory subcategory in customCourse.Subcategories)
+				{
+					if ((int)GameParam.selectorParam.m_SelectedCourse == subcategory.CourseEnum)
+					{
+						Il2CppStructArray<MainGameDef.eCourse> newStoryModeDef = new Il2CppStructArray<MainGameDef.eCourse>(Main.storyDict["original"].Count);
+						if (subcategory.SpecialMode == "Golden")
+						{
+							mainGameStage.m_GameKind = MainGameDef.eGameKind.Golden;
+						}
+						else if (subcategory.SpecialMode == "Rotten")
+						{
+							mainGameStage.m_GameKind = MainGameDef.eGameKind.Rotten;
+                        }
+						else
+						{
+							if (customCourse.CategoryType == "Story")
+							{
+								mainGameStage.m_GameKind = MainGameDef.eGameKind.Story;
+							}
+							else
+							{
+								mainGameStage.m_GameKind = MainGameDef.eGameKind.Challenge;
+							}
+						}
+						MgStageDatum mgStageDatum = new MgStageDatum(mgStageDatumPtr);
+					}
+				}
+			}
 
 			if (GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)8 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)9 || GameParam.selectorParam.mainGameMode == (SelectorDef.MainGameKind)10)
 			{
@@ -116,9 +148,40 @@ namespace BMCustomStage.Patches
                 }
                 MainGameDef._storyCourses_k__BackingField = storyDef;
             }
+            if (mainGameStage.m_SelectedResultButton == MgResultMenu.eTextKind.Next)
+            {
+				if (MgCourseDataManager.GetNextStage(mainGameStage.m_Player.goalKind) == 0)
+				{
+					// 0 Means the Category is changing, attempt to find the next course and adjust the type accordingly
+					foreach (CustomCourse course in DataManager.Courses)
+					{
+						foreach(Subcategory subcategory in course.Subcategories)
+						{
+							if (subcategory.CourseEnum == (int)GameParam.selectorParam.selectedCourse)
+							{
+                                if (MgCourseDataManager.Instance.m_CourseDataDict[GameParam.selectorParam.selectedCourse].m_NextCourseStr != "Invalid")
+                                {
+									GameParam.selectorParam.selectedGameKind = MgCourseDataManager.Instance.m_CourseDataDict[MgCourseDataManager.Instance.m_CourseDataDict[GameParam.selectorParam.selectedCourse].nextCourse].gameKind;
+                                }
+                            }
+						}
+					}
+					
+				}
+				
+            }
             MainGameStagePatch.ResultDecideOriginal(thisPtr);
 
+			
+
         }
+
+		private static void ChangeNextStage(IntPtr thisPtr)
+		{
+			
+			MainGameStagePatch.ChangeNextStageOriginal(thisPtr);
+		}
+
 
         private static readonly Dictionary<string, string> shaderNameToAbPath = new Dictionary<string, string>
 		{
@@ -497,6 +560,13 @@ namespace BMCustomStage.Patches
         private static MainGameStagePatch.ResultDecideDelegate ResultDecideOriginal;
 
         private delegate void ResultDecideDelegate(IntPtr thisPtr);
+
+		private static MainGameStagePatch.ChangeNextStageDelegate ChangeNextStageInstance;
+
+		private static MainGameStagePatch.ChangeNextStageDelegate ChangeNextStageOriginal;
+
+		private delegate void ChangeNextStageDelegate(IntPtr thisPtr);
+
 
     }
 }

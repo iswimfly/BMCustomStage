@@ -111,4 +111,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /D "C:\Users\Jason\Desktop\Banana Mania Modding\CustomStageDecomp\BMCustomStage\bin\Debug\BMCustomStage.dll" "H:\SteamLibrary\steamapps\common\smbbm\mods\Custom Stage Loader\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

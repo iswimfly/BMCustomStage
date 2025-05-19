@@ -188,13 +188,13 @@ namespace BMCustomStage
                                     }
                                 }
                             }
-                            if (course.CategoryType == "Story" || course.CategoryType == "Challenge")
+                            if (course.CategoryType == "Story" || course.CategoryType == "Challenge" || course.CategoryType == "Special")
                             {
                                 nameToCourse.Add(course.CourseName, course);
                             }
                             else
                             {
-                                Log.Error($"Invalid Course: {course.CourseName}. Please specify \"Story\" or \"Challenge\" as the category type.");
+                                Log.Error($"Invalid Course: {course.CourseName}. Please specify \"Story\", \"Challenge\", or \"Special\" as the category type.");
                             }
                         }
                     }

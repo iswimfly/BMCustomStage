@@ -79,22 +79,27 @@ namespace BMCustomStage
                 menuModded = true;
                 Main.VibeCheck();
             }
-            if (Main.debugMode && Input.GetKeyDown(UnityEngine.KeyCode.R))
+            if (Main.debugMode)
             {
-                return;
-                if (!Main.isReloading && MainGame.mainGameStage == null)
+                if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
                 {
-                    Log.Info("Unloading stage and background assetbundles...");
-                    Main.isReloading = true;
-                    foreach (CustomStageYaml stage in DataManager.Stages)
+                    if (Input.GetKeyDown(KeyCode.R))
                     {
-                        AssetBundleCache.UnloadAssetBundle(stage.AssetBundleName);
+                        if (!Main.isReloading && MainGame.mainGameStage == null)
+                        {
+                            Log.Info("Unloading stage and background assetbundles...");
+                            Main.isReloading = true;
+                            foreach (CustomStageYaml stage in DataManager.Stages)
+                            {
+                                AssetBundleCache.UnloadAssetBundle(stage.AssetBundleName);
+                            }
+                            foreach (CustomBgYaml background in DataManager.Backgrounds)
+                            {
+                                AssetBundleCache.UnloadAssetBundle(background.AssetBundleName);
+                            }
+                            Log.Info("Unloaded stage and background assetbundles");
+                        }
                     }
-                    foreach (CustomBgYaml background in DataManager.Backgrounds)
-                    {
-                        AssetBundleCache.UnloadAssetBundle(background.AssetBundleName);
-                    }
-                    Log.Info("Unloaded stage and background assetbundles");
                 }
             }
             if (Main.isReloading && !SingletonBase<AssetBundleCache>.Instance.is_unloading)
@@ -275,7 +280,7 @@ namespace BMCustomStage
 
             }
 
-            foreach(CustomCourse course in DataManager.Courses)
+            foreach (CustomCourse course in DataManager.Courses)
             {
                 AssetBundleCache.element_t element = new AssetBundleCache.element_t();
                 if (!SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.ContainsKey(course.ThumbnailAssetBundle))
@@ -289,7 +294,7 @@ namespace BMCustomStage
                 {
                     SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.Add(course.ThumbnailPath, course.ThumbnailAssetBundle);
                 }
-                foreach(Subcategory subcategory in course.Subcategories)
+                foreach (Subcategory subcategory in course.Subcategories)
                 {
                     if (!SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.ContainsKey(subcategory.ThumbnailPath))
                     {
@@ -413,57 +418,89 @@ namespace BMCustomStage
                     {
                         nextCourse = course.Subcategories[(course.Subcategories.IndexOf(subcat) + 1)];
                     }
-                    if (course.CategoryType == "Story")
+
+                    switch (course.CategoryType)
                     {
-                        if (nextCourse != null)
-                        {
+                        case "Story":
+                            if (nextCourse != null)
+                            {
+                                if (subcat.ThumbnailPath == null)
+                                {
+                                    subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
+                                }
+                                else
+                                {
+                                    if (!IsValidThumbnail(subcat.ThumbnailPath))
+                                    {
+                                        subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
+                                    }
+                                }
+                                customCourseDatum = new MgCourseDatum
+                                {
+                                    m_GameKindStr = "Story",
+                                    m_CourseStr = $"Custom_Stages_{subcat.Name}",
+                                    m_courseNameTextReference = new TextReference
+                                    {
+                                        m_Key = $"maingame_custom_{subcat.Name}"
+                                    },
+                                    m_ThumbnailSpritePath = subcat.ThumbnailPath,
+                                    m_NextCourse = (MainGameDef.eCourse)nextCourse.CourseEnum,
+                                    m_NextCourseStr = $"Custom_Stages_{nextCourse.Name}",
+                                    m_StartMovieIDStr = "Invalid",
+                                    m_EndMovieIDStr = "Invalid",
+                                    m_elementList = new Il2CppSystem.Collections.Generic.List<MgCourseDatum.element_t>()
+                                };
+                            }
+                            else
+                            {
+                                if (subcat.ThumbnailPath == null)
+                                {
+                                    subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
+                                }
+                                else
+                                {
+                                    if (!IsValidThumbnail(subcat.ThumbnailPath))
+                                    {
+                                        subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
+                                    }
+                                }
+                                customCourseDatum = new MgCourseDatum
+                                {
+                                    m_GameKindStr = "Story",
+                                    m_CourseStr = $"Custom_Stages_{course.CourseName}{subcat.Name}",
+                                    m_courseNameTextReference = new TextReference
+                                    {
+                                        m_Key = $"maingame_custom_{course.CourseName}{subcat.Name}"
+                                    },
+                                    m_ThumbnailSpritePath = subcat.ThumbnailPath,
+                                    m_StartMovieIDStr = "Invalid",
+                                    m_EndMovieIDStr = "Invalid",
+                                    m_NextCourseStr = "Invalid",
+                                    m_elementList = new Il2CppSystem.Collections.Generic.List<MgCourseDatum.element_t>()
+                                };
+                            }
+                            storyCourse.Add((MainGameDef.eCourse)subcat.CourseEnum);
+                            break;
+
+                        case "Challenge":
                             if (subcat.ThumbnailPath == null)
                             {
-                                subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
+                                subcat.ThumbnailPath = "thumbnails/custom/thumb_custchallenge.png";
                             }
                             else
                             {
                                 if (!IsValidThumbnail(subcat.ThumbnailPath))
                                 {
-                                    subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
+                                    subcat.ThumbnailPath = "thumbnails/custom/thumb_custchallenge.png";
                                 }
                             }
                             customCourseDatum = new MgCourseDatum
                             {
-                                m_GameKindStr = "Story",
-                                m_CourseStr = $"Custom_Stages_{subcat.Name}",
+                                m_GameKindStr = "Challenge",
+                                m_CourseStr = $"Custom_Stages_{course.CourseName}{subcat.Name}",
                                 m_courseNameTextReference = new TextReference
                                 {
-                                    m_Key = $"maingame_custom_{subcat.Name}"
-                                },
-                                m_ThumbnailSpritePath = subcat.ThumbnailPath,
-                                m_NextCourse = (MainGameDef.eCourse)nextCourse.CourseEnum,
-                                m_NextCourseStr = $"Custom_Stages_{nextCourse.Name}",
-                                m_StartMovieIDStr = "Invalid",
-                                m_EndMovieIDStr = "Invalid",
-                                m_elementList = new Il2CppSystem.Collections.Generic.List<MgCourseDatum.element_t>()
-                            };
-                        }
-                        else
-                        {
-                            if (subcat.ThumbnailPath == null)
-                            {
-                                subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
-                            }
-                            else
-                            {
-                                if (!IsValidThumbnail(subcat.ThumbnailPath))
-                                {
-                                    subcat.ThumbnailPath = "thumbnails/custom/thumb_custworld.png";
-                                }
-                            }
-                            customCourseDatum = new MgCourseDatum
-                            {
-                                m_GameKindStr = "Story",
-                                m_CourseStr = $"Custom_Stages_{subcat.Name}",
-                                m_courseNameTextReference = new TextReference
-                                {
-                                    m_Key = $"maingame_custom_{subcat.Name}"
+                                    m_Key = $"maingame_custom_{course.CourseName}{subcat.Name}"
                                 },
                                 m_ThumbnailSpritePath = subcat.ThumbnailPath,
                                 m_StartMovieIDStr = "Invalid",
@@ -471,38 +508,59 @@ namespace BMCustomStage
                                 m_NextCourseStr = "Invalid",
                                 m_elementList = new Il2CppSystem.Collections.Generic.List<MgCourseDatum.element_t>()
                             };
-                        }
-                        storyCourse.Add((MainGameDef.eCourse)subcat.CourseEnum);
-                    }
-                    else
-                    {
-                        if (subcat.ThumbnailPath == null)
-                        {
-                            subcat.ThumbnailPath = "thumbnails/custom/thumb_custchallenge.png";
-                        }
-                        else
-                        {
-                            if (!IsValidThumbnail(subcat.ThumbnailPath))
+                            break;
+
+                        case "Special":
+                            if (subcat.ThumbnailPath == null)
                             {
                                 subcat.ThumbnailPath = "thumbnails/custom/thumb_custchallenge.png";
                             }
-                        }
-                        customCourseDatum = new MgCourseDatum
-                        {
-                            m_GameKindStr = "Challenge",
-                            m_CourseStr = $"Custom_Stages_{subcat.Name}",
-                            m_courseNameTextReference = new TextReference
+                            else
                             {
-                                m_Key = $"maingame_custom_{subcat.Name}"
-                            },
-                            m_ThumbnailSpritePath = subcat.ThumbnailPath,
-                            m_StartMovieIDStr = "Invalid",
-                            m_EndMovieIDStr = "Invalid",
-                            m_NextCourseStr = "Invalid",
-                            m_elementList = new Il2CppSystem.Collections.Generic.List<MgCourseDatum.element_t>()
-                        };
+                                if (!IsValidThumbnail(subcat.ThumbnailPath))
+                                {
+                                    subcat.ThumbnailPath = "thumbnails/custom/thumb_custchallenge.png";
+                                }
+                            }
+                            MainGameDef.eGameKind gameKind = MainGameDef.eGameKind.Invalid;
+                            switch(subcat.SpecialMode)
+                            {
+                                case "Golden":
+                                    break;
+
+                                case "Rotten":
+                                    break;
+
+                                default:
+                                    if (course.CategoryType == "Challenge")
+                                    {
+                                        gameKind = MainGameDef.eGameKind.Challenge;
+                                    }
+                                    else
+                                    {
+                                        gameKind = MainGameDef.eGameKind.Story;
+                                    }
+                                    break;
+                            }
+                            customCourseDatum = new MgCourseDatum
+                            {
+                                m_GameKind = gameKind,
+                                m_GameKindStr = subcat.SpecialMode,
+                                m_CourseStr = $"Custom_Stages_{course.CourseName}{subcat.Name}",
+                                m_courseNameTextReference = new TextReference
+                                {
+                                    m_Key = $"maingame_custom_{course.CourseName}{subcat.Name}"
+                                },
+                                m_ThumbnailSpritePath = subcat.ThumbnailPath,
+                                m_StartMovieIDStr = "Invalid",
+                                m_EndMovieIDStr = "Invalid",
+                                m_NextCourseStr = "Invalid",
+                                m_elementList = new Il2CppSystem.Collections.Generic.List<MgCourseDatum.element_t>()
+                            };
+                            break;
                     }
                     newCourses.Add(subcat.CourseEnum, customCourseDatum);
+                        
                 }
                 if (course.CategoryType == "Story")
                 {
@@ -644,6 +702,9 @@ namespace BMCustomStage
                 };
                 customStageDatum.Initialize();
                 SingletonBase<MgStageDataManager>.Instance.m_stageDataDict[stage.StageId] = customStageDatum;
+                MgBgDataManager mgBgDataManager = UnityEngine.Object.FindObjectOfType<MgBgDataManager>();
+                stageIndexToCue.Add(stage.StageId, mgBgDataManager.m_bgDataDict[customStageDatum.bg].bgmCue);
+                stageIndexToBg.Add(stage.StageId, customStageDatum.bg);
             }
 
             if (SaveData.userParam.mainGameCourseParam.m_CourseParamDict.m_Dict.ContainsKey(44.ToString()))
@@ -764,36 +825,50 @@ namespace BMCustomStage
                 foreach (CustomCourse course in DataManager.Courses)
                 {
                     SelMgModeItemData courseItemData = new SelMgModeItemData();
-                    if (course.CategoryType == "Story")
+                    switch (course.CategoryType)
                     {
-                        courseItemData.transitionMenuKind = (SelectorDef.MainMenuKind)4;
-                        courseItemData.mainGamemode = (SelectorDef.MainGameKind)9;
-                        courseItemData.mainGameKind = MainGameDef.eGameKind.Story;
-                    }
-                    else
-                    {
-                        courseItemData.transitionMenuKind = (SelectorDef.MainMenuKind)6;
-                        courseItemData.mainGamemode = (SelectorDef.MainGameKind)10;
-                        courseItemData.mainGameKind = MainGameDef.eGameKind.Challenge;
-                        SelMgCmCourseItemDataListObject subcategories = new SelMgCmCourseItemDataListObject();
-                        subcategories.m_ModeNameText = new TextReference
-                        {
-                            m_Key = $"maingame_custom_{course.CourseName}"
-                        };
-                        foreach (Subcategory subcat in course.Subcategories)
-                        {
-                            subcategories.m_ItemDataList.Add(new SelMgCmCourseItemData
+                        case "Story":
+                            courseItemData.transitionMenuKind = (SelectorDef.MainMenuKind)4;
+                            courseItemData.mainGamemode = (SelectorDef.MainGameKind)9;
+                            courseItemData.mainGameKind = MainGameDef.eGameKind.Story;
+                            break;
+
+                        case "Challenge":
+                            courseItemData.transitionMenuKind = (SelectorDef.MainMenuKind)6;
+                            courseItemData.mainGamemode = (SelectorDef.MainGameKind)10;
+                            courseItemData.mainGameKind = MainGameDef.eGameKind.Challenge;
+                            SelMgCmCourseItemDataListObject subcategories = new SelMgCmCourseItemDataListObject();
+                            subcategories.m_ModeNameText = new TextReference
                             {
-                                m_Course = $"{subcat.Name}",
-                                m_Difficulty = 1,
-                                m_Text = new TextReference
+                                m_Key = $"maingame_custom_{course.CourseName}"
+                            };
+                            foreach (Subcategory subcat in course.Subcategories)
+                            {
+                                subcategories.m_ItemDataList.Add(new SelMgCmCourseItemData
                                 {
-                                    m_Key = $"maingame_custom_{subcat.Name}"
-                                }
-                            });
-                        }
-                        categoryDict.Add(course.CourseName, subcategories);
+                                    m_Course = $"{subcat.Name}",
+                                    m_Difficulty = 1,
+                                    m_Text = new TextReference
+                                    {
+                                        m_Key = $"maingame_custom_{subcat.Name}"
+                                    }
+                                });
+                            }
+                            categoryDict.Add(course.CourseName, subcategories);
+                            break;
+
+                        case "Special":
+                            courseItemData.transitionMenuKind = (SelectorDef.MainMenuKind)4;
+                            courseItemData.mainGamemode = (SelectorDef.MainGameKind)9;
+                            courseItemData.mainGameKind = MainGameDef.eGameKind.Story;
+                            foreach (Subcategory subcat in course.Subcategories)
+                            {
+                                
+                            }
+                            break;
+
                     }
+
                     courseItemData.textKey = $"maingame_custom_{course.CourseName}";
                     courseItemData.descriptionTextKey = "";
                     courseItemData.isHideText = true;
@@ -850,12 +925,16 @@ namespace BMCustomStage
         private static bool IsValidThumbnail(string thumbnail)
         {
             bool result = false;
-            Sprite sprite = AssetBundleCache.LoadAsset<Sprite>(thumbnail);
-            if (sprite != null )
+            Sprite sprite;
+            try
             {
-                result = true;
+                sprite = AssetBundleCache.LoadAsset<Sprite>(thumbnail);
             }
-            return result;
+            catch
+            {
+                sprite = null;
+            }
+            return sprite != null;
         }
 
         public static void VibeCheck()
@@ -917,7 +996,7 @@ namespace BMCustomStage
             {
                 // This throws an error and I could not care less
             }
-            
+
         }
 
 

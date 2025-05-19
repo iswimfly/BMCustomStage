@@ -35,6 +35,8 @@ namespace BMCustomStage
         public string Name { get; set; }
         [JsonProperty("courseID")]
         public int CourseID { get; set; }
+        [JsonProperty("specialMode", Required = Required.Default)]
+        public string SpecialMode { get; set; } = string.Empty;
         [JsonProperty("stages")]
         public List<int> Stages { get; set; }
         [JsonProperty("thumbnail_name")]

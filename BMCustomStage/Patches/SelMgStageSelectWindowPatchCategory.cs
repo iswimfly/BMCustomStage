@@ -29,7 +29,27 @@ namespace BMCustomStage.Patches
                     if ((int)GameParam.selectorParam.selectedCourse == subcategory.CourseEnum)
                     {
                         Il2CppStructArray<MainGameDef.eCourse> newStoryModeDef = new Il2CppStructArray<MainGameDef.eCourse>(Main.storyDict["original"].Count);
+                        switch (subcategory.SpecialMode)
+                        {
+                            case "Golden":
+                                GameParam.selectorParam.selectedGameKind = MainGameDef.eGameKind.Golden;
+                                break;
 
+                            case "Rotten":
+                                GameParam.selectorParam.selectedGameKind = MainGameDef.eGameKind.Rotten;
+                                break;
+
+                            default:
+                                if (customCourse.CategoryType == "Challenge")
+                                {
+                                    GameParam.selectorParam.selectedGameKind = MainGameDef.eGameKind.Challenge;
+                                }
+                                else
+                                {
+                                    GameParam.selectorParam.selectedGameKind = MainGameDef.eGameKind.Story;
+                                }
+                                break;
+                        }
                         for (int j = 0; j < Main.storyDict["original"].Count; j++)
                         {
                             newStoryModeDef[j] = Main.storyDict["original"][j];
