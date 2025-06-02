@@ -264,6 +264,8 @@ namespace BMCustomStage
 										else
 										{
                                             customBgYaml.AssetBundleFullPath = Path.Combine(bgDirectory, customBgYaml.AssetBundleName);
+                                            customBgYaml.LightSceneAssetBundleFullPath = Path.Combine(bgDirectory, customBgYaml.LightSceneAssetBundle);
+                                            lightingSettingsAbToPathDict.Add(customBgYaml.LightSceneAssetBundle, customBgYaml.LightSceneAssetBundleFullPath);
                                             if (!File.Exists(customBgYaml.AssetBundleFullPath))
                                             {
                                                 Log.Warning("Failed to load background at " + bgFolderPath + $":\n    Asset Bundle not found at: \"{customBgYaml.AssetBundleFullPath}\"");
@@ -439,6 +441,8 @@ namespace BMCustomStage
 		private static readonly Dictionary<string, CustomCourse> nameToCourse = new Dictionary<string, CustomCourse>();
 
         private static readonly Dictionary<string, string> thumbnailAbNameToAbPath = new Dictionary<string, string>();
+
+        public static Dictionary<string, string> lightingSettingsAbToPathDict = new Dictionary<string, string>();
 
 	}
 }

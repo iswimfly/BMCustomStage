@@ -47,6 +47,10 @@ namespace BMCustomStage.Patches
             {
                 result = IL2CPP.ManagedStringToIl2Cpp(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "custom_stages", "placeholder"));
             }
+            else if (DataManager.lightingSettingsAbToPathDict[fileName] != null)
+            {
+                result = IL2CPP.ManagedStringToIl2Cpp(DataManager.lightingSettingsAbToPathDict[fileName]);
+            }
             else
             {
                 result = AssetBundleCachePatch.GetStreamingAssetFullpathOriginal(fileNamePtr, isUrl);

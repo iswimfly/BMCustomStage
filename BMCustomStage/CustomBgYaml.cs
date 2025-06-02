@@ -1,6 +1,7 @@
 ﻿using System;
 using Flash2;
 using YamlDotNet.Serialization;
+using static Flash2.stcoli_smkb2;
 
 
 namespace BMCustomStage
@@ -51,11 +52,32 @@ namespace BMCustomStage
         public string ShaderAssetBundleFullPath { get; set; }
 
         [YamlIgnore]
+        public string LightSceneAssetBundleFullPath { get; set; }
+
+        [YamlIgnore]
         public string BackgroundPrefab
         {
             get
             {
                 return string.Format("bg/custom/bg_{0}/background.prefab", CustomBackgroundName.ToLower());
+            }
+        }
+
+        [YamlIgnore]
+        public string LightPrefab
+        {
+            get
+            {
+                return string.Format("bg/custom/bg_{0}/light.prefab", CustomBackgroundName.ToLower());
+            }
+        }
+
+        [YamlIgnore]
+        public string ScreenEffectPrefab
+        {
+            get
+            {
+                return string.Format("bg/custom/bg_{0}/screeneffect.prefab", CustomBackgroundName.ToLower());
             }
         }
 
@@ -69,6 +91,15 @@ namespace BMCustomStage
         }
 
         [YamlIgnore]
+        public string LightSceneAssetBundle
+        {
+            get
+            {
+                return "scene_lightingsettings_light_" + AuthorName.ToLower() + "_" + CustomBackgroundName.ToLower() + "_unity";
+            }
+        }
+
+        [YamlIgnore]
         public int bgm_cuesheetid {  get; set; }
         [YamlIgnore]
         public int bgm_cueid { get; set; }
@@ -77,6 +108,18 @@ namespace BMCustomStage
         public int bgm_dx_cuesheetid { get; set; }
         [YamlIgnore]
         public int bgm_dx_cueid { get; set; }
+
+        [YamlIgnore]
+        public int lightSceneID { get; set; }
+
+        [YamlIgnore]
+        public string lightSceneStr
+        {
+            get
+            {
+                return "Light_" + AuthorName.ToLower() + "_" + CustomBackgroundName.ToLower();
+            }
+        }
 
     }
 }

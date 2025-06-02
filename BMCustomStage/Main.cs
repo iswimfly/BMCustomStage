@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using BMCustomStage.Patches;
+﻿using BMCustomStage.Patches;
 using Flash2;
 using Flash2.Selector;
 using Flash2.Selector.MainGame.ChallengeMode.SMB1;
 using Flash2.Selector.MainGame.StoryMode;
 using Framework;
 using Framework.Text;
-using Framework.Window;
-using Il2CppSystem;
-using Il2CppSystem.Collections.Generic;
 using Il2CppSystem.Reflection;
-using Il2CppSystem.Xml;
+using System;
+using System.IO;
+using System.Linq;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace BMCustomStage
 {
-	public static class Main
+    public static class Main
 	{
+
         public static bool melonMode = false;
         private static bool isInitialised;
         private static SelMainMenuSequence sequence = null;
@@ -32,6 +27,8 @@ namespace BMCustomStage
         private static SelectorDef.MainGameKind storedGameKind;
         public static string selectedCourse;
         public static MgBgDatum storedBgDatum = new MgBgDatum();
+        public static int LightIdCap = 93;
+
 
         public static void OnModLoad(System.Collections.Generic.Dictionary<string, object> settingsDict)
 		{
@@ -96,6 +93,7 @@ namespace BMCustomStage
                             foreach (CustomBgYaml background in DataManager.Backgrounds)
                             {
                                 AssetBundleCache.UnloadAssetBundle(background.AssetBundleName);
+                                AssetBundleCache.UnloadAssetBundle(background.LightSceneAssetBundle);
                             }
                             Log.Info("Unloaded stage and background assetbundles");
                         }
@@ -114,8 +112,11 @@ namespace BMCustomStage
                 foreach (CustomBgYaml background2 in DataManager.Backgrounds)
                 {
                     AssetBundleCache.element_t element = new AssetBundleCache.element_t();
+                    AssetBundleCache.element_t element2 = new AssetBundleCache.element_t();
                     SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add(background2.AssetBundleName, element);
                     element.Load(background2.AssetBundleName);
+                    SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add(background2.LightSceneAssetBundle, element2);
+                    element2.Load(background2.LightSceneAssetBundle);
                 }
                 Log.Info("Loaded stage and background assetbundles");
                 Main.isReloading = false;
@@ -321,30 +322,42 @@ namespace BMCustomStage
             }
 
             Il2CppSystem.Collections.Generic.List<string> shaderDependencyList = new Il2CppSystem.Collections.Generic.List<string>();
-
             foreach (CustomBgYaml bg in DataManager.Backgrounds)
             {
                 AssetBundleCache.element_t element = new AssetBundleCache.element_t();
                 AssetBundleCache.element_t element2 = new AssetBundleCache.element_t();
+                AssetBundleCache.element_t element3 = new AssetBundleCache.element_t();
                 SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add(bg.AssetBundleName, element);
                 SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.Add(bg.BackgroundPrefab, bg.AssetBundleName);
                 SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.Add(string.Format("bg/custom/bg_{0}/light.prefab", bg.CustomBackgroundName.ToLower()), bg.AssetBundleName);
                 SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.Add(string.Format("bg/custom/bg_{0}/screeneffect.prefab", bg.CustomBackgroundName.ToLower()), bg.AssetBundleName);
+                element.Load(bg.AssetBundleName);
+                if (File.Exists(bg.LightSceneAssetBundleFullPath))
+                {
+                    SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add(bg.LightSceneAssetBundle, element2);
+                    SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.Add($"Scene/LightingSettings/{bg.lightSceneStr}.unity", bg.LightSceneAssetBundle);
+                    element2.Load(bg.LightSceneAssetBundle);
+                    bg.lightSceneID = LightIdCap;
+                    AppScene.ASSETBUNDLE_SCENE_FILE_DICT.Add((AppScene.eID)bg.lightSceneID, $"Scene/LightingSettings/{bg.lightSceneStr}.unity");
+                    LightIdCap++;
+                }
+                shaderDependencyList.Add("shader");
                 if (bg.CustomShaders)
                 {
-                    shaderDependencyList.Add("shader");
-                    SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add(bg.ShaderAssetBundleName, element2);
+                    SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add(bg.ShaderAssetBundleName, element3);
                     for (int j = 0; j < bg.CustomShaderCount; j++)
                     {
                         SingletonBase<AssetBundleCache>.Instance.m_pathToAssetBundleNameDict.Add($"shader/custom_shader{j}.shader", bg.ShaderAssetBundleName);
                     }
                     shaderDependencyList.Add(bg.ShaderAssetBundleName);
-                    SingletonBase<AssetBundleCache>.Instance.m_assetBundleDependencyDict[bg.OriginalBackgroundAssetBundle] = shaderDependencyList;
-                    element2.Load(bg.ShaderAssetBundleName);
+                    element3.Load(bg.ShaderAssetBundleName);
                 }
-                element.Load(bg.AssetBundleName);
+                SingletonBase<AssetBundleCache>.Instance.m_assetBundleDependencyDict[bg.OriginalBackgroundAssetBundle] = shaderDependencyList;
+                if (SingletonBase<AssetBundleCache>.Instance.m_assetBundleDependencyDict.ContainsKey(bg.LightSceneAssetBundle))
+                {
+                    SingletonBase<AssetBundleCache>.Instance.m_assetBundleDependencyDict[bg.LightSceneAssetBundle] = shaderDependencyList;
+                }
             }
-
             // Placeholder thumbnails if they're missing from the pack's assetbundle
             AssetBundleCache.element_t elementPlaceholder = new AssetBundleCache.element_t();
             SingletonBase<AssetBundleCache>.Instance.m_assetBundleNameToEntityDict.Add("placeholder", elementPlaceholder);

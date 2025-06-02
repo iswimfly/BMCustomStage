@@ -129,6 +129,10 @@ namespace BMCustomStage.Patches
                     {
 						Console.WriteLine("Replacing original background...");
                         ogDatum.m_bgObjPath = Main.storedBgDatum.m_bgObjPath;
+						ogDatum.m_lightObjPath = Main.storedBgDatum.m_lightObjPath;
+						ogDatum.m_screenEffectObjPath = Main.storedBgDatum.m_screenEffectObjPath;
+						ogDatum.m_lightSceneId = Main.storedBgDatum.m_lightSceneId;
+						ogDatum.m_lightSceneIdStr = Main.storedBgDatum.m_lightSceneIdStr;
                     }
                 }
             }
