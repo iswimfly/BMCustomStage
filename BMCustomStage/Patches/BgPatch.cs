@@ -48,13 +48,13 @@ namespace BMCustomStage.Patches
                                     Main.storedBgDatum.m_bgObjPath = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_bgObjPath;
                                     Main.storedBgDatum.m_lightObjPath = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightObjPath;
                                     Main.storedBgDatum.m_screenEffectObjPath = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_screenEffectObjPath;
+                                    Main.storedBgDatum.m_lightSceneId = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightSceneId;
+                                    Main.storedBgDatum.m_lightSceneIdStr = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightSceneIdStr;
                                     Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_bgObjPath = bgYaml.BackgroundPrefab;
                                     Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightObjPath = bgYaml.LightPrefab;
                                     Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_screenEffectObjPath = bgYaml.ScreenEffectPrefab;
                                     if (File.Exists(bgYaml.LightSceneAssetBundleFullPath))
                                     {
-                                        Main.storedBgDatum.m_lightSceneId = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightSceneId;
-                                        Main.storedBgDatum.m_lightSceneIdStr = Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightSceneIdStr;
                                         Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightSceneId = (AppScene.eID)bgYaml.lightSceneID;
                                         Main.originalBgDatumDict[bgYaml.OriginalBackgroundName].m_lightSceneIdStr = bgYaml.lightSceneStr;
                                     }
